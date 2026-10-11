@@ -81,6 +81,42 @@ Your site will be live at `https://snjoroggras.web.app` (a short custom
 Hosting site name within the `snjor-og-gras-alftanes` project — see
 `firebase.json`'s `hosting.site`).
 
+## 4. Turn on real email notifications
+
+When someone submits the order form, the site writes a document into a
+`mail` collection in Firestore — but **nothing actually emails you yet**
+until you install Firebase's official **"Trigger Email" extension**, which
+watches that collection and sends the real email via SMTP.
+
+This needs your email password, so **do this yourself directly in the
+Firebase Console** — never paste an email password into a chat with an AI
+assistant or anywhere else; the Console's own form keeps it private to
+Google/Firebase.
+
+1. In Gmail: turn on
+   [2-Step Verification](https://myaccount.google.com/signinoptions/two-step-verification),
+   then generate an
+   [App Password](https://myaccount.google.com/apppasswords) (pick "Mail"
+   as the app). Copy the 16-character code it gives you.
+2. Go to the
+   [Trigger Email extension page](https://console.firebase.google.com/project/snjor-og-gras-alftanes/extensions/install?ref=firebase/firestore-send-email)
+   for this project and click **Install**.
+3. When asked for configuration:
+   - **Collection path**: `mail`
+   - **SMTP connection URI**: `smtps://your-email@gmail.com:YOUR_APP_PASSWORD@smtp.gmail.com:465`
+     (swap in the Gmail address you're sending *from* and the app password
+     from step 1 — this can be a different account than the one you
+     receive at)
+   - **Default FROM address**: the same Gmail address
+4. Finish the install. From then on, every new document in `mail` gets
+   emailed out automatically — no redeploy of the website needed.
+
+The recipient address is hard-coded as
+`sturlamar.gardslattur@gmail.com` in `src/lib/content.ts`
+(`business.notifyEmail`) and locked in by `firestore.rules`
+(`isValidMail`) so the form can only ever notify that one address — update
+both files together if it ever needs to change.
+
 ## Picking a look
 
 Click the **"Útlit"** button in the bottom-right corner of the site at any
