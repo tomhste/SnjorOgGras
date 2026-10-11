@@ -1,0 +1,17 @@
+{
+  "name": "functions",
+  "description": "Cloud Functions for Snjór & Gras — sends an email whenever a new order comes in, by watching the `mail` collection in Firestore.",
+  "scripts": {
+    "deploy": "firebase deploy --only functions"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^14.0.0",
+    "firebase-functions": "^7.0.0",
+    "nodemailer": "^10.0.0"
+  },
+  "private": true
+}

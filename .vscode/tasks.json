@@ -311,6 +311,22 @@
 			"isBackground": false,
 			"problemMatcher": [],
 			"group": "build"
+		},
+		{
+			"label": "deploy-functions",
+			"type": "shell",
+			"command": "npx",
+			"args": [
+				"firebase-tools",
+				"deploy",
+				"--only",
+				"functions",
+				"--project",
+				"snjor-og-gras-alftanes"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
 		}
 	]
 }

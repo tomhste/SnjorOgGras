@@ -85,31 +85,52 @@ Hosting site name within the `snjor-og-gras-alftanes` project — see
 
 When someone submits the order form, the site writes a document into a
 `mail` collection in Firestore — but **nothing actually emails you yet**
-until you install Firebase's official **"Trigger Email" extension**, which
-watches that collection and sends the real email via SMTP.
+until the Cloud Function in `functions/` is deployed and given SMTP
+credentials.
 
-This needs your email password, so **do this yourself directly in the
-Firebase Console** — never paste an email password into a chat with an AI
-assistant or anywhere else; the Console's own form keeps it private to
-Google/Firebase.
+This is a self-managed Cloud Function (`functions/index.js`,
+`sendOrderEmail`) rather than Firebase's official "Trigger Email"
+extension, because that extension
+[is being retired on March 31, 2027](https://firebase.google.com/docs/extensions/users/migrate) —
+writing our own function avoids ever needing to migrate later.
 
-1. In Gmail: turn on
-   [2-Step Verification](https://myaccount.google.com/signinoptions/two-step-verification),
-   then generate an
-   [App Password](https://myaccount.google.com/apppasswords) (pick "Mail"
-   as the app). Copy the 16-character code it gives you.
-2. Go to the
-   [Trigger Email extension page](https://console.firebase.google.com/project/snjor-og-gras-alftanes/extensions/install?ref=firebase/firestore-send-email)
-   for this project and click **Install**.
-3. When asked for configuration:
-   - **Collection path**: `mail`
-   - **SMTP connection URI**: `smtps://your-email@gmail.com:YOUR_APP_PASSWORD@smtp.gmail.com:465`
-     (swap in the Gmail address you're sending *from* and the app password
-     from step 1 — this can be a different account than the one you
-     receive at)
-   - **Default FROM address**: the same Gmail address
-4. Finish the install. From then on, every new document in `mail` gets
-   emailed out automatically — no redeploy of the website needed.
+### One-time setup
+
+**a) Upgrade to the Blaze (pay-as-you-go) plan.** Cloud Functions require
+it — only you can do this (it needs a payment method). Visit:
+https://console.firebase.google.com/project/snjor-og-gras-alftanes/usage/details
+and follow the upgrade flow. In practice, a small local business sending a
+handful of notification emails will cost **$0/month** — Cloud Functions'
+free tier covers 2 million invocations/month even on Blaze.
+
+**b) Set the SMTP credentials as secrets** (never type these into a chat
+with an AI, or commit them to the repo — this command prompts for the
+value directly in your own terminal, hidden from the screen):
+
+```bash
+npx firebase functions:secrets:set SMTP_EMAIL --project snjor-og-gras-alftanes
+# paste the Gmail address to send FROM when prompted
+
+npx firebase functions:secrets:set SMTP_APP_PASSWORD --project snjor-og-gras-alftanes
+# paste a 16-character Gmail App Password when prompted — generate one at
+# https://myaccount.google.com/apppasswords (requires 2-Step Verification
+# to be turned on first: https://myaccount.google.com/signinoptions/two-step-verification)
+```
+
+This can be any Gmail account you like — including the same one that
+manages this Firebase project, if that's simplest.
+
+**c) Deploy the function:**
+
+```bash
+cd functions
+npm install
+cd ..
+npx firebase deploy --only functions --project snjor-og-gras-alftanes
+```
+
+From then on, every new document in the `mail` collection gets emailed
+out automatically — no further redeploys needed when orders come in.
 
 The recipient address is hard-coded as
 `sturlamar.gardslattur@gmail.com` in `src/lib/content.ts`
