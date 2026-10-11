@@ -16,7 +16,7 @@ export const business = {
   // Where new-order email notifications are sent. Must exactly match the
   // address allowed in firestore.rules (isValidMail) — update both places
   // together if this ever changes.
-  notifyEmail: "tomhste@gmail.com",
+  notifyEmail: "sturlamar.gardslattur@gmail.com",
   // Default Firebase Hosting URL — swap this for a custom domain later if
   // you buy one, and update it here so SEO/social metadata stays correct.
   siteUrl: "https://snjoroggras.web.app",

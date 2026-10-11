@@ -42,7 +42,7 @@ service cloud.firestore {
   function isValidMail(data) {
     return data.keys().hasOnly(['to', 'message', 'createdAt'])
       && data.to is list && data.to.size() == 1
-      && data.to[0] == 'tomhste@gmail.com'
+      && data.to[0] == 'sturlamar.gardslattur@gmail.com'
       && data.message is map
       && data.message.keys().hasOnly(['subject', 'text'])
       && data.message.subject is string && data.message.subject.size() <= 200

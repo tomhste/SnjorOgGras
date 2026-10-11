@@ -1,30 +1,31 @@
 "use client";
 
 import { useRef } from "react";
+import dynamic from "next/dynamic";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
-import { MorphSVGPlugin } from "gsap/MorphSVGPlugin";
 import { business } from "@/lib/content";
-import { HeroIllustration, SNOWFLAKE_PATH, SUN_PATH } from "@/components/HeroIllustration";
 import { useMagnetic } from "@/lib/useMagnetic";
 
-gsap.registerPlugin(SplitText, MorphSVGPlugin);
+gsap.registerPlugin(SplitText);
+
+const SeasonCompareSlider = dynamic(
+  () => import("@/components/SeasonCompareSlider").then((m) => m.SeasonCompareSlider),
+  {
+    ssr: false,
+    loading: () => <div className="h-full w-full animate-pulse bg-surface-2" />,
+  }
+);
 
 export function Hero() {
   const root = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const illustrationRef = useRef<SVGSVGElement>(null);
-  const sliderRef = useRef<HTMLInputElement>(null);
-  const seasonTl = useRef<gsap.core.Timeline | null>(null);
+  const sliderWrapRef = useRef<HTMLDivElement>(null);
   const [callRef, callHandlers] = useMagnetic<HTMLAnchorElement>(0.25);
 
   useGSAP(
     () => {
-      const reduceMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      ).matches;
-
       const split = titleRef.current
         ? SplitText.create(titleRef.current, {
             type: "lines",
@@ -63,114 +64,16 @@ export function Hero() {
           "-=0.3"
         )
         .fromTo(
-          illustrationRef.current,
-          { opacity: 0, scale: 0.92 },
+          sliderWrapRef.current,
+          { opacity: 0, scale: 0.95 },
           { opacity: 1, scale: 1, duration: 0.9, ease: "power2.out" },
           "-=0.6"
         );
-
-      // --- The interactive bit: a season timeline you can scrub ---
-      // The centerpiece: one path literally morphs point-for-point from a
-      // snowflake into a sun as the slider moves from 0 to 100 — a real
-      // shape transformation, not just a cross-fade between two icons.
-      // Snow/grass/glow stay on the earlier split-at-50% pattern so the
-      // "Bæði" midpoint still reads as "both seasons, fully present".
-      const seasonTimeline = gsap.timeline({
-        paused: true,
-        defaults: { ease: "power2.inOut" },
-      });
-      seasonTimeline
-        .fromTo(
-          ".illu-weather-shape",
-          { morphSVG: SNOWFLAKE_PATH, fill: "#dff1fb", stroke: "#aee0f5" },
-          { morphSVG: SUN_PATH, fill: "#f6c445", stroke: "#e2a52f", duration: 1 },
-          0
-        )
-        .fromTo(".illu-glow-ice", { opacity: 1 }, { opacity: 0, duration: 1 }, 0)
-        .fromTo(".illu-glow-sun", { opacity: 0 }, { opacity: 1, duration: 1 }, 0)
-        .fromTo(
-          ".illu-snow",
-          { opacity: 1, y: 0 },
-          { opacity: 0, y: 14, duration: 0.5 },
-          0.5
-        )
-        .fromTo(
-          ".illu-grass-blade",
-          { scaleY: 0.08 },
-          { scaleY: 1, duration: 0.5 },
-          0
-        );
-      seasonTimeline.progress(0.5);
-      seasonTl.current = seasonTimeline;
-
-      if (!reduceMotion) {
-        // Ambient loops — independent of the scrub position, so the scene
-        // never feels frozen even before anyone touches the slider.
-        gsap.to(".illu-flake", {
-          y: "+=6",
-          rotation: 15,
-          duration: 2,
-          yoyo: true,
-          repeat: -1,
-          ease: "sine.inOut",
-          stagger: { each: 0.15, from: "random" },
-        });
-        gsap.to(".illu-ring", {
-          rotation: 360,
-          duration: 60,
-          repeat: -1,
-          ease: "none",
-        });
-        gsap.to(".illu-grass-blade", {
-          rotation: 4,
-          duration: 1.8,
-          yoyo: true,
-          repeat: -1,
-          ease: "sine.inOut",
-          stagger: { each: 0.12, from: "random" },
-        });
-      }
 
       return () => split?.revert();
     },
     { scope: root }
   );
-
-  function scrub(value: number) {
-    seasonTl.current?.progress(value / 100);
-  }
-
-  function jumpTo(value: number) {
-    const slider = sliderRef.current;
-    const tl = seasonTl.current;
-    if (!slider || !tl) return;
-    const proxy = { v: Number(slider.value) };
-    gsap.to(proxy, {
-      v: value,
-      duration: 0.7,
-      ease: "power2.inOut",
-      onUpdate: () => {
-        slider.value = String(proxy.v);
-        tl.progress(proxy.v / 100);
-      },
-      onComplete: () => {
-        if (value === 0 || value === 100) {
-          gsap.fromTo(
-            ".illu-weather-shape",
-            { scale: 1 },
-            {
-              scale: 1.12,
-              duration: 0.18,
-              yoyo: true,
-              repeat: 1,
-              ease: "power1.inOut",
-              transformOrigin: "0px 0px",
-            }
-          );
-        }
-      },
-    });
-  }
 
   return (
     <section ref={root} className="border-b border-border bg-background">
@@ -212,53 +115,11 @@ export function Hero() {
           </div>
         </div>
 
-        <div>
-          <HeroIllustration
-            ref={illustrationRef}
-            className="mx-auto w-full max-w-sm text-foreground/80 lg:max-w-none"
-          />
-
-          <div className="mx-auto mt-6 flex max-w-sm flex-col items-center gap-3 lg:max-w-none">
-            <input
-              ref={sliderRef}
-              type="range"
-              min={0}
-              max={100}
-              defaultValue={50}
-              onInput={(e) => scrub(Number(e.currentTarget.value))}
-              className="w-full accent-accent"
-              aria-label="Skipta á milli vetrar og sumars"
-            />
-            <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-              <button
-                type="button"
-                onClick={() => jumpTo(0)}
-                className="transition hover:text-accent"
-              >
-                ❄ Vetur
-              </button>
-              <span aria-hidden className="opacity-40">
-                ·
-              </span>
-              <button
-                type="button"
-                onClick={() => jumpTo(50)}
-                className="transition hover:text-accent"
-              >
-                Bæði
-              </button>
-              <span aria-hidden className="opacity-40">
-                ·
-              </span>
-              <button
-                type="button"
-                onClick={() => jumpTo(100)}
-                className="transition hover:text-accent"
-              >
-                ☀ Sumar
-              </button>
-            </div>
-          </div>
+        <div
+          ref={sliderWrapRef}
+          className="mx-auto aspect-[4/3] w-full max-w-sm overflow-hidden rounded-2xl shadow-xl lg:max-w-none"
+        >
+          <SeasonCompareSlider />
         </div>
       </div>
     </section>

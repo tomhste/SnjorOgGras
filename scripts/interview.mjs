@@ -53,7 +53,7 @@ async function main() {
   );
   const notifyEmail = await ask(
     "Á hvaða netfang eiga tilkynningar um nýjar beiðnir að berast?",
-    "tomhste@gmail.com"
+    "sturlamar.gardslattur@gmail.com"
   );
 
   console.log("\n--- Þjónusta ---");
@@ -85,7 +85,7 @@ async function main() {
 
   if (owners.length === 0) owners.push(...defaults);
 
-  const notifyChanged = notifyEmail !== "tomhste@gmail.com";
+  const notifyChanged = notifyEmail !== "sturlamar.gardslattur@gmail.com";
 
   const output = `/**
  * All the real-world business info for Snjór & Gras, pulled straight from
