@@ -3,8 +3,9 @@ import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { CookieNotice } from "@/components/CookieNotice";
+import { ScrollTriggerRefresh } from "@/components/ScrollTriggerRefresh";
 import { defaultThemeId } from "@/lib/themes";
-import { business } from "@/lib/content";
+import { business, services } from "@/lib/content";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -63,6 +64,7 @@ const jsonLd = {
   "@type": "LocalBusiness",
   name: business.name,
   description: business.intro,
+  image: `${business.siteUrl}/images/summer.jpg`,
   telephone: business.phoneHref.replace("tel:", ""),
   areaServed: {
     "@type": "Place",
@@ -73,6 +75,22 @@ const jsonLd = {
     addressLocality: business.location,
     addressCountry: "IS",
   },
+  // Álftanes, Iceland — public, approximate coordinates for the service
+  // area (not a specific street address), helps local/map search results.
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 64.1072,
+    longitude: -22.0164,
+  },
+  knowsLanguage: "is",
+  makesOffer: services.map((service) => ({
+    "@type": "Offer",
+    itemOffered: {
+      "@type": "Service",
+      name: service.title,
+      description: service.description,
+    },
+  })),
   url: business.siteUrl,
 };
 
@@ -103,6 +121,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         <ThemeSwitcher />
         <CookieNotice />
+        <ScrollTriggerRefresh />
       </body>
     </html>
   );

@@ -10,6 +10,10 @@ const STORAGE_KEY = "snjor-og-gras-cookie-consent";
  * There's no analytics or ad tracking, so this is intentionally short —
  * but under GDPR even "just preferences" storage deserves a clear notice
  * and an explicit accept action rather than silently assuming consent.
+ *
+ * Styled as a small floating card (bottom-left, so it doesn't collide
+ * with the theme switcher at bottom-right) with a plain CSS slide-up
+ * entrance — no animation library needed for something this simple.
  */
 export function CookieNotice() {
   const [visible, setVisible] = useState(false);
@@ -27,21 +31,21 @@ export function CookieNotice() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[60] border-t border-border bg-surface px-6 py-5 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-      <div className="mx-auto flex max-w-5xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="max-w-2xl text-sm text-muted">
-          Þessi vefsíða notar localStorage í vafranum þínum til að muna
-          hvaða útlit þú velur — ekkert annað er vistað og engin
-          mælingar-/auglýsingakaka er notuð.
-        </p>
-        <button
-          type="button"
-          onClick={accept}
-          className="shrink-0 self-start bg-accent px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-accent-contrast transition hover:brightness-110 sm:self-auto"
-        >
-          Í lagi
-        </button>
-      </div>
+    <div className="animate-cookie-in fixed bottom-4 left-4 z-[60] w-[calc(100%-2rem)] max-w-sm rounded-2xl border border-border bg-surface p-5 shadow-xl sm:bottom-6 sm:left-6">
+      <p className="flex items-center gap-2 font-[family-name:var(--font-display)] text-base italic">
+        🍪 Vefkökur
+      </p>
+      <p className="mt-2 text-sm text-muted">
+        Þessi vefsíða vistar aðeins eitt í vafranum þínum: hvaða útlit þú
+        velur. Engin mælinga- eða auglýsingakaka er notuð.
+      </p>
+      <button
+        type="button"
+        onClick={accept}
+        className="mt-4 w-full bg-accent px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-accent-contrast transition hover:brightness-110"
+      >
+        Í lagi
+      </button>
     </div>
   );
 }

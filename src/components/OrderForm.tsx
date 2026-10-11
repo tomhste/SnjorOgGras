@@ -7,13 +7,10 @@ import { z } from "zod";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import confetti from "canvas-confetti";
 import { db, isFirebaseConfigured } from "@/lib/firebase";
 import { business } from "@/lib/content";
 import { useMagnetic } from "@/lib/useMagnetic";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const schema = z.object({
   name: z.string().trim().min(1, "Vantar nafn").max(200),
@@ -58,6 +55,14 @@ export function OrderForm() {
 
   useGSAP(
     () => {
+      // Deliberately not gated behind ScrollTrigger (unlike Services/Team):
+      // this form is the main conversion point on the page, and a stale
+      // ScrollTrigger position calculation (e.g. from web fonts or the
+      // client-only hero photo slider loading late and shifting page
+      // height) can leave ScrollTrigger-gated elements permanently stuck
+      // at their initial opacity: 0 — see ScrollTriggerRefresh.tsx for the
+      // general-purpose fix, but this element gets its own fromTo with no
+      // scroll dependency at all, so it can never end up unusably invisible.
       gsap.fromTo(
         ".order-form-el",
         { y: 24, opacity: 0 },
@@ -67,7 +72,6 @@ export function OrderForm() {
           duration: 0.6,
           stagger: 0.08,
           ease: "power3.out",
-          scrollTrigger: { trigger: root.current, start: "top 80%" },
         }
       );
     },

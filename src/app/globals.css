@@ -80,6 +80,27 @@ a:visited {
   color: inherit;
 }
 
+@keyframes cookie-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-cookie-in {
+  animation: cookie-in 0.5s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-cookie-in {
+    animation: none;
+  }
+}
+
 /* Fine paper-grain texture — a subtle bit of tactility so flat colour
    fields don't read as a generic flat template background. */
 body::before {
