@@ -84,15 +84,18 @@ exports.sendOrderEmail = onDocumentCreated(
       host: "smtp.gmail.com",
       port: 465,
       secure: true,
+      // .trim() guards against accidentally including the spaces Google
+      // displays App Passwords with (e.g. "abcd efgh ijkl mnop") when the
+      // secret value was set by copy-pasting straight from the browser.
       auth: {
-        user: smtpEmail.value(),
-        pass: smtpAppPassword.value(),
+        user: smtpEmail.value().trim(),
+        pass: smtpAppPassword.value().replace(/\s+/g, ""),
       },
     });
 
     try {
       await transporter.sendMail({
-        from: `Snjór & Gras <${smtpEmail.value()}>`,
+        from: `Snjór & Gras <${smtpEmail.value().trim()}>`,
         to,
         subject,
         text,
