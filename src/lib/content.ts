@@ -19,7 +19,7 @@ export const business = {
   notifyEmail: "tomhste@gmail.com",
   // Default Firebase Hosting URL — swap this for a custom domain later if
   // you buy one, and update it here so SEO/social metadata stays correct.
-  siteUrl: "https://snjor-og-gras-alftanes.web.app",
+  siteUrl: "https://snjoroggras.web.app",
 };
 
 export const services = [

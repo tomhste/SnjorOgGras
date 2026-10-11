@@ -77,7 +77,9 @@ npm run build          # static export -> out/
 npx firebase deploy --only hosting,firestore:rules
 ```
 
-Your site will be live at `https://<project-id>.web.app`.
+Your site will be live at `https://snjoroggras.web.app` (a short custom
+Hosting site name within the `snjor-og-gras-alftanes` project — see
+`firebase.json`'s `hosting.site`).
 
 ## Picking a look
 

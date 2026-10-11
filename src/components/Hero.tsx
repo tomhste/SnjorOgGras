@@ -4,11 +4,12 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
+import { MorphSVGPlugin } from "gsap/MorphSVGPlugin";
 import { business } from "@/lib/content";
-import { HeroIllustration } from "@/components/HeroIllustration";
+import { HeroIllustration, SNOWFLAKE_PATH, SUN_PATH } from "@/components/HeroIllustration";
 import { useMagnetic } from "@/lib/useMagnetic";
 
-gsap.registerPlugin(SplitText);
+gsap.registerPlugin(SplitText, MorphSVGPlugin);
 
 export function Hero() {
   const root = useRef<HTMLDivElement>(null);
@@ -69,25 +70,28 @@ export function Hero() {
         );
 
       // --- The interactive bit: a season timeline you can scrub ---
-      // 0 = full winter, 50 = both (the original artwork, resting state),
-      // 100 = full summer. Two half-length tweens per element instead of
-      // one continuous one, so the midpoint lands exactly on "everything
-      // visible at full strength" rather than a 50% opacity blend.
+      // The centerpiece: one path literally morphs point-for-point from a
+      // snowflake into a sun as the slider moves from 0 to 100 — a real
+      // shape transformation, not just a cross-fade between two icons.
+      // Snow/grass/glow stay on the earlier split-at-50% pattern so the
+      // "Bæði" midpoint still reads as "both seasons, fully present".
       const seasonTimeline = gsap.timeline({
         paused: true,
         defaults: { ease: "power2.inOut" },
       });
       seasonTimeline
         .fromTo(
+          ".illu-weather-shape",
+          { morphSVG: SNOWFLAKE_PATH, fill: "#dff1fb", stroke: "#aee0f5" },
+          { morphSVG: SUN_PATH, fill: "#f6c445", stroke: "#e2a52f", duration: 1 },
+          0
+        )
+        .fromTo(".illu-glow-ice", { opacity: 1 }, { opacity: 0, duration: 1 }, 0)
+        .fromTo(".illu-glow-sun", { opacity: 0 }, { opacity: 1, duration: 1 }, 0)
+        .fromTo(
           ".illu-snow",
-          { opacity: 1, scale: 1, y: 0 },
-          {
-            opacity: 0,
-            scale: 0.8,
-            y: 14,
-            duration: 0.5,
-            transformOrigin: "260px 420px",
-          },
+          { opacity: 1, y: 0 },
+          { opacity: 0, y: 14, duration: 0.5 },
           0.5
         )
         .fromTo(
@@ -95,15 +99,7 @@ export function Hero() {
           { scaleY: 0.08 },
           { scaleY: 1, duration: 0.5 },
           0
-        )
-        .fromTo(
-          ".illu-sun",
-          { opacity: 0, scale: 0.5 },
-          { opacity: 1, scale: 1, duration: 0.5 },
-          0
-        )
-        .fromTo(".illu-divider", { opacity: 0 }, { opacity: 0.35, duration: 0.5 }, 0)
-        .to(".illu-divider", { opacity: 0, duration: 0.5 }, 0.5);
+        );
       seasonTimeline.progress(0.5);
       seasonTl.current = seasonTimeline;
 
@@ -119,12 +115,11 @@ export function Hero() {
           ease: "sine.inOut",
           stagger: { each: 0.15, from: "random" },
         });
-        gsap.to(".illu-sun-rays", {
+        gsap.to(".illu-ring", {
           rotation: 360,
-          duration: 26,
+          duration: 60,
           repeat: -1,
           ease: "none",
-          transformOrigin: "430px 110px",
         });
         gsap.to(".illu-grass-blade", {
           rotation: 4,
@@ -161,15 +156,15 @@ export function Hero() {
       onComplete: () => {
         if (value === 0 || value === 100) {
           gsap.fromTo(
-            ".illu-house",
+            ".illu-weather-shape",
             { scale: 1 },
             {
-              scale: 1.04,
-              duration: 0.16,
+              scale: 1.12,
+              duration: 0.18,
               yoyo: true,
               repeat: 1,
               ease: "power1.inOut",
-              transformOrigin: "260px 300px",
+              transformOrigin: "0px 0px",
             }
           );
         }

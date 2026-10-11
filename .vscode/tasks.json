@@ -12,6 +12,61 @@
 			"isBackground": true,
 			"problemMatcher": [],
 			"group": "build"
+		},
+		{
+			"label": "lint",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"lint"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "create-hosting-site",
+			"type": "shell",
+			"command": "npx",
+			"args": [
+				"firebase-tools",
+				"hosting:sites:create",
+				"snjoroggras",
+				"--project",
+				"snjor-og-gras-alftanes"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "build",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "deploy-new-site",
+			"type": "shell",
+			"command": "npx",
+			"args": [
+				"firebase-tools",
+				"deploy",
+				"--only",
+				"hosting,firestore:rules",
+				"--project",
+				"snjor-og-gras-alftanes"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
 		}
 	]
 }
